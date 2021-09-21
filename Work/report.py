@@ -21,6 +21,7 @@ def read_portfolio(filename_porfolio):
 
     return portfolio
 
+
 def read_prices(filename_prices):
     """
     Read a CSV file of price data into a dict mapping names to prices.
@@ -34,6 +35,22 @@ def read_prices(filename_prices):
 
     return prices
 
+
+def make_report(portfolio, prices):
+    """
+    Create list of (name, shares, price, change tuples given a portfolio list
+    and prices dictionary.
+    """
+    report = [] 
+    for stock in portfolio:
+        current_price = prices[stock['name']]
+        change = current_price - stock['price']
+        report_line = (stock['name'], stock['shares'], current_price, change)
+        report.append(report_line)
+
+    return report
+
+
 if len(sys.argv) == 3:
     filename_portfolio = sys.argv[1]
     filename_prices = sys.argv[2]
@@ -44,17 +61,13 @@ else:
 portfolio = read_portfolio(filename_portfolio)
 prices = read_prices(filename_prices)
 
-# Calculate the total cost of the portfolio
-total_cost = 0.0
-for s in portfolio:
-    total_cost += s['shares'] * s['price']
+# Generate the report data
+report = make_report(portfolio, prices)
 
-print(f'Total cost {total_cost:.2f}')
-
-# Compute the current value of the portfolio
-total_value = 0.0
-for s in portfolio:
-    total_value += s['shares'] * prices[s['name']]
-
-print(f'Current value {total_value:.2f}')
-print(f'Gain {total_value - total_cost:.2f}')
+# Output the report
+headers = ('Name', 'Shares', 'Price', 'Change')
+name, shares, price, change = headers
+print(f'{name:>10s} {shares:>10s} {price:>10s} {change:>10s}')
+print(('-' * 10 + ' ') * len(headers))
+for name, shares, price, change in report:
+    print(f"{name:>10s} {shares:>10d} {'$'+str(price):>10s} {change:>10.2f}")
