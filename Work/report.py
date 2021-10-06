@@ -58,6 +58,33 @@ def make_report(portfolio, prices):
     return report
 
 
+def print_report(reportdata):
+    """
+    Prints a formatted table from a list of (name, shares, price, chagne) tuples.
+    """
+    headers = ('Name', 'Shares', 'Price', 'Change')
+    name, shares, price, change = headers
+    print(f'{name:>10s} {shares:>10s} {price:>10s} {change:>10s}')
+    print(('-' * 10 + ' ') * len(headers))
+    for name, shares, price, change in reportdata:
+        print(f"{name:>10s} {shares:>10d} {'$'+str(price):>10s} {change:>10.2f}")
+
+
+def portfolio_report(filename_portfolio, filename_prices):
+    """
+    Make a stock report given portfolio and price data files
+    """
+    # Read data files
+    portfolio = read_portfolio(filename_portfolio)
+    prices = read_prices(filename_prices)
+
+    # Generate the report data
+    report = make_report(portfolio, prices)
+
+    # Print it out
+    print_report(report)
+
+
 if len(sys.argv) == 3:
     filename_portfolio = sys.argv[1]
     filename_prices = sys.argv[2]
@@ -65,16 +92,5 @@ else:
     filename_portfolio = 'Data/portfolio.csv'
     filename_prices = 'Data/prices.csv'
 
-portfolio = read_portfolio(filename_portfolio)
-prices = read_prices(filename_prices)
 
-# Generate the report data
-report = make_report(portfolio, prices)
-
-# Output the report
-headers = ('Name', 'Shares', 'Price', 'Change')
-name, shares, price, change = headers
-print(f'{name:>10s} {shares:>10s} {price:>10s} {change:>10s}')
-print(('-' * 10 + ' ') * len(headers))
-for name, shares, price, change in report:
-    print(f"{name:>10s} {shares:>10d} {'$'+str(price):>10s} {change:>10.2f}")
+portfolio_report(filename_portfolio, filename_prices)
