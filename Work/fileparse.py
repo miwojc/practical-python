@@ -1,10 +1,13 @@
 # fileparse.py
 import csv
 
-def parse_csv(filename, select=None, types=None, has_headers=True, delimiter=','):
+def parse_csv(filename, select=None, types=None, has_headers=True, delimiter=',', silence_errors=False):
     """
-    Parse a CSV file into a list of records
+    Parse a CSV file into a list of records with type conversion
     """
+    if select and not has_headers:
+        raise RuntimeError("select argument requires column headers")
+
     with open(filename) as f:
         rows = csv.reader(f, delimiter=delimiter)
 
@@ -17,7 +20,7 @@ def parse_csv(filename, select=None, types=None, has_headers=True, delimiter=','
             headers = select
 
         records = []
-        for row in rows:
+        for rowno, row in enumerate(rows,start=1):
             if not row:
                 continue
 
@@ -27,7 +30,13 @@ def parse_csv(filename, select=None, types=None, has_headers=True, delimiter=','
             
             # Apply type conversion to the row
             if types:
-                row = [func(val) for func, val in zip(types, row)]
+                try:
+                    row = [func(val) for func, val in zip(types, row)]
+                except ValueError as e:
+                    if not silence_errors:
+                        print(f"Row {rowno}: Couldn't convert {row}")
+                        print(f"Row {rowno}: Reason {e}")
+                    continue
 
             # Make a dictionary if headers of tupe if no headers
             if headers:
