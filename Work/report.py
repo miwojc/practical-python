@@ -1,8 +1,7 @@
 # report.py
 import csv
-import sys
 
-def read_portfolio(filename_porfolio):
+def read_portfolio(filename_portfolio):
     """
     Read a stock portfolio file into a list of dictionaries with keys
     name, shares and price.
@@ -70,13 +69,13 @@ def print_report(reportdata):
         print(f"{name:>10s} {shares:>10d} {'$'+str(price):>10s} {change:>10.2f}")
 
 
-def portfolio_report(filename_portfolio, filename_prices):
+def portfolio_report(portfoliofile, pricefile):
     """
     Make a stock report given portfolio and price data files
     """
     # Read data files
-    portfolio = read_portfolio(filename_portfolio)
-    prices = read_prices(filename_prices)
+    portfolio = read_portfolio(portfoliofile)
+    prices = read_prices(pricefile)
 
     # Generate the report data
     report = make_report(portfolio, prices)
@@ -85,12 +84,12 @@ def portfolio_report(filename_portfolio, filename_prices):
     print_report(report)
 
 
-if len(sys.argv) == 3:
-    filename_portfolio = sys.argv[1]
-    filename_prices = sys.argv[2]
-else:
-    filename_portfolio = 'Data/portfolio.csv'
-    filename_prices = 'Data/prices.csv'
+def main(args):
+    if len(args) != 3:
+        raise SystemExit(f'Usage: {args[0]} portfoliofile pricefile')
+    portfolio_report(args[1], args[2])
 
 
-portfolio_report(filename_portfolio, filename_prices)
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
