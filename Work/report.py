@@ -1,60 +1,35 @@
 # report.py
-import csv
+import fileparse
 
-def read_portfolio(filename_portfolio):
+def read_portfolio(filename):
     """
     Read a stock portfolio file into a list of dictionaries with keys
     name, shares and price.
     """
-    portfolio = [] 
-    with open(filename_portfolio, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-
-        for rowno, row in enumerate(rows):
-            record = dict(zip(headers, row))
-            try:
-                stock = {
-                    'name' : record['name'],
-                    'shares' : int(record['shares']),
-                    'price' : float(record['price'])
-                }
-            except ValueError:
-                print(f'Row {rowno}: Bad row: {row}')
-            portfolio.append(stock)
-
-    return portfolio
+    with open(filename) as lines:
+        return fileparse.parse_csv(lines, select=['name','shares','price'], types=[str,int,float])
 
 
-def read_prices(filename_prices):
+def read_prices(filename):
     """
     Read a CSV file of price data into a dict mapping names to prices.
     """
-    prices = {} 
-    with open(filename_prices, 'rt') as f:
-        rows = csv.reader(f)
-        for row in rows:
-            try:
-                prices[row[0]] = float(row[1])
-            except IndexError:
-                pass
-
-    return prices
+    with open(filename) as lines:
+        return dict(fileparse.parse_csv(lines, types=[str,float], has_headers=False))
 
 
 def make_report(portfolio, prices):
     """
-    Create list of (name, shares, price, change tuples given a portfolio list
+    Create a list of (name, shares, price, change tuples given a portfolio list
     and prices dictionary.
     """
-    report = [] 
+    rows = [] 
     for stock in portfolio:
         current_price = prices[stock['name']]
         change = current_price - stock['price']
-        report_line = (stock['name'], stock['shares'], current_price, change)
-        report.append(report_line)
-
-    return report
+        summary = (stock['name'], stock['shares'], current_price, change)
+        rows.append(summary)
+    return rows
 
 
 def print_report(reportdata):
