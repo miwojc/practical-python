@@ -15,18 +15,18 @@ def parse_csv(lines, select=None, types=None, has_headers=True, delimiter=',', s
 
     # If specific columns have been selected, make indices for filtering
     if select:
-        indices = [headers.index(colname) for colname in select]
+        indices = [ headers.index(colname) for colname in select ]
         headers = select
 
     records = []
-    for rowno, row in enumerate(rows,start=1):
-        if not row:
+    for rowno, row in enumerate(rows, 1):
+        if not row:     # Skip rows with no data
             continue
 
         # If specific column indices are selected, pick them out
         if select:
-            row = [row[index] for index in indices]
-        
+            row = [ row[index] for index in indices]
+
         # Apply type conversion to the row
         if types:
             try:
@@ -37,11 +37,11 @@ def parse_csv(lines, select=None, types=None, has_headers=True, delimiter=',', s
                     print(f"Row {rowno}: Reason {e}")
                 continue
 
-        # Make a dictionary if headers of tupe if no headers
+        # Make a dictionary or a tuple
         if headers:
             record = dict(zip(headers, row))
         else:
-            record = tuple(row) 
+            record = tuple(row)
         records.append(record)
 
-        return records
+    return records
