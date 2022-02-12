@@ -68,4 +68,10 @@ def main(args):
 
 if __name__ == '__main__':
     import sys
+    import logging
+    logging.basicConfig(
+        filename = 'app.log'
+        filemode = 'w'
+        level = logging.WARNING,
+    )
     main(sys.argv)
